@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatMessage } from '../types';
 import { Send, Bot, User, Copy, Check, Sparkles, Scale, RefreshCw } from 'lucide-react';
+import { chatLegal } from '../services/apiService';
 
 interface LegalChatAssistantProps {
   language: 'ar' | 'en';
@@ -65,20 +66,11 @@ Feel free to ask any question regarding contract clauses, rescission, liquidated
     setLoading(true);
 
     try {
-      const res = await fetch('/api/chat-legal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: text.trim(),
-          history: messages.slice(-6),
-          language,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to get answer');
-      }
+      const data = await chatLegal(
+        text.trim(),
+        messages.slice(-6),
+        language
+      );
 
       const assistantMsg: ChatMessage = {
         id: 'reply-' + Date.now(),

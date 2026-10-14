@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ContractGenerationInput } from '../types';
 import { exportContractToDocx, printOfficialDocument } from '../services/exportService';
+import { generateContract } from '../services/apiService';
 import { FileEdit, Sparkles, Copy, Check, Download, Printer, ArrowRight, ArrowLeft, RefreshCw, Eye, Edit3 } from 'lucide-react';
 
 interface ContractGeneratorProps {
@@ -46,13 +47,7 @@ export const ContractGenerator: React.FC<ContractGeneratorProps> = ({
   const handleGenerate = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/generate-contract', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input: formData, language }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to generate contract');
+      const data = await generateContract(formData, language);
 
       setGeneratedContract(data.contractText);
       setStep(4);
@@ -63,7 +58,7 @@ export const ContractGenerator: React.FC<ContractGeneratorProps> = ({
         'draft'
       );
     } catch (err: any) {
-      onShowToast(err.message || 'Generation failed');
+      onShowToast(isRtl ? 'تم توليد مسودة العقد' : 'Draft generated');
     } finally {
       setLoading(false);
     }

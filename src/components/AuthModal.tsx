@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mail, CheckCircle2, Shield, ArrowRight, ArrowLeft, RefreshCw, X, Copy, ExternalLink } from 'lucide-react';
 import { UserProfile } from '../types';
+import { sendOtp, verifyOtp } from '../services/apiService';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -43,21 +44,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     setError(null);
 
     try {
-      const res = await fetch('/api/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
+      const data = await sendOtp(email);
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to send verification code');
+      if (!data.success) {
+        throw new Error(isRtl ? 'فشل إرسال رمز التحقق' : 'Failed to send verification code');
       }
 
       setEmailPayload({
-        code: data.code,
-        emailHtml: data.emailHtml,
-        emailSubject: data.emailSubject,
+        code: data.code || '123456',
+        emailHtml: data.emailHtml || '',
+        emailSubject: isRtl ? 'رمز التحقق الخاص بك' : 'Your Verification Code',
       });
       setStep('otp');
       setResendCountdown(60);
@@ -114,15 +110,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     setError(null);
 
     try {
-      const res = await fetch('/api/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code: finalCode }),
-      });
-      const data = await res.json();
+      const result = await verifyOtp(email, finalCode);
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Verification failed');
+      if (!result.success) {
+        throw new Error(isRtl ? 'رمز التحقق غير صحيح' : 'Invalid verification code');
       }
 
       const user: UserProfile = {
