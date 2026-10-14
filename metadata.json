@@ -1,0 +1,6 @@
+{
+  "name": "Smart Contract Analyzer | محلل العقود الذكي",
+  "description": "Cutting-edge legal contract intelligence platform fine-tuned on Egyptian law and customary commercial practice. Analyze legal gaps, calculate risk scores, compare versions, and generate contracts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
